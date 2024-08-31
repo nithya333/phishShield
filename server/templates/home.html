@@ -17,7 +17,7 @@
             color: #007BFF;
         }
 
-        form {
+        #urlForm {
             background: #fff;
             padding: 20px;
             border-radius: 8px;
@@ -54,7 +54,7 @@
             background-color: #0056b3;
         }
 
-        #result {
+        #result_url, #result_status {
             background: #fff;
             padding: 20px;
             border-radius: 8px;
@@ -69,6 +69,9 @@
 </head>
 <body>
     <h1>URL Phishing Detection</h1>
+    <form action="/view_history" method="get" style = "align-items: right; text-align: right;">
+      <button type="submit">View History</button>
+    </form>
     
     <form id="urlForm">
         <label for="url">Enter URL:</label>
@@ -76,7 +79,9 @@
         <button type="submit">Submit</button>
     </form>
 
-    <div id="result">
+    <div id="result_url">
+    </div>
+    <div id="result_status" style = "font-size: xx-large; font-weight: 700; font-variant: small-caps;">
         <!-- Prediction result will be displayed here -->
     </div>
 
@@ -96,7 +101,7 @@
             .then(response => response.json())
             .then(data => {
                 console.log('URL submitted:', data.message);
-                document.getElementById('result').textContent = 'Processing, please wait...';
+                document.getElementById('result_url').textContent = 'Processing, please wait...';
 
                 // Periodically check for the result
                 const checkResult = setInterval(() => {
@@ -106,7 +111,12 @@
                             if (result.message) {
                                 console.log('Still processing...');
                             } else {
-                                document.getElementById('result').textContent = `Prediction for ${result.url}: ${result.prediction}`;
+                                document.getElementById('result_url').textContent = `Prediction for ${result.url}:`;
+                                document.getElementById('result_status').textContent = `${result.prediction}`;
+                                if (result.prediction == 'legit')
+                                    document.getElementById('result_status').style.backgroundColor = "green";
+                                else
+                                    document.getElementById('result_status').style.backgroundColor = "red";
                                 clearInterval(checkResult);  // Stop checking once the result is available
                             }
                         });
