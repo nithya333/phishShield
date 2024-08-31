@@ -1,27 +1,33 @@
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.tree import DecisionTreeClassifier
 import joblib
 import json
 import redis
+import time  # Simulate delay
 from classify import extract
 
-RedisPort=6379
-redisClient =redis.Redis("localhost",RedisPort)
+RedisPort = 6379
+redisClient = redis.Redis("localhost", RedisPort)
 
-
-rf_classifier=joblib.load("rf.joblib")
+rf_classifier = joblib.load("rf.joblib")
 
 def predict(features_df):
-  prediction=rf_classifier.predict(features_df)
-  print(prediction)
-  return prediction
-  
-  
-if __name__=="__main__":
-  while True:
-    if(redisClient.llen("paramsQueue")>0):
-      json_str=redisClient.lpop("paramsQueue")
-      features=extract(json.loads(json.loads(json_str)))
-      print(features)
-      print(features.head())
-      predict(features)
+    prediction = rf_classifier.predict(features_df)
+    result = "legit" if not prediction[0] else "phishing"
+    print(result)
+    return result
+
+if __name__ == "__main__":
+    while True:
+        if(redisClient.llen("paramsQueue") > 0):
+            json_str = redisClient.lpop("paramsQueue")
+            features = extract(json.loads(json.loads(json_str)))
+            fts = json.loads(json.loads(json_str))
+            print(features)
+            print(features.head())
+            print(fts['url'])
+
+            
+            prediction = predict(features)
+            
+            # Store the result in a Redis hash with the key "url_predictions"
+            redisClient.hset("url_predictions", fts['url'], prediction)
