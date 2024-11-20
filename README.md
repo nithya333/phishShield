@@ -1,4 +1,4 @@
-# Phish Shield
+# PhishShield
 ML tool to detect phishing websites.
 
 
