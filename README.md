@@ -1,6 +1,5 @@
 # Phish Shield
-
-ML Tool to detect phishing websites.
+ML tool to detect phishing websites.
 
 
 ##### Team:
